@@ -1,5 +1,5 @@
 import logging
-from enum import IntEnum, auto
+from enum import IntEnum
 
 from django.conf import settings
 from django.db import models
@@ -9,10 +9,10 @@ log = logging.getLogger(__name__)
 
 
 class InvitationState(IntEnum):
-    UNSENT = auto()
-    SENT = auto()
-    CONSUMED = auto()
-    EXPIRED = auto()
+    UNSENT = 1
+    SENT = 2
+    CONSUMED = 3
+    EXPIRED = 4
 
 
 class Invitation(models.Model):
