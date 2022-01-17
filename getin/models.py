@@ -86,5 +86,5 @@ class Invitation(models.Model):
 
     class Meta:
         db_table = "getin_invitations"
-        indexes = [models.Index(fields=("email",))]
+        indexes = [models.Index(fields=("email", "created_at"))]
         ordering = ["-created_at"]
