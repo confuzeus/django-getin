@@ -51,29 +51,18 @@ class Invitation(models.Model):
         """
         log.info(f"Invitation {self.pk} has been forced to expire.")
 
-    def send_invitation(self):
-        raise NotImplemented()
-
-    class Meta:
-        abstract = True
-
-
-class EmailInvitation(Invitation):
-    USER_RELATED_NAME = "getin_email_invitation"
-    email = models.EmailField(unique=True)
-
     @transition(
         field="state",
         source=InvitationState.UNSENT.value,
         target=InvitationState.SENT.value,
     )
     def send_invitation(self):
-        log.info(f"Invitation send to {self.email}")
+        raise NotImplemented()
 
     def __str__(self):
-        return f"Email invitation for {self.email}."
+        return self.code
 
     class Meta:
-        db_table = "getin_email_invitations"
+        db_table = "getin_invitations"
         indexes = [models.Index(fields=("email",))]
         ordering = ["-created_at"]
