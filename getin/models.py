@@ -13,11 +13,11 @@ from getin import settings as app_settings
 log = logging.getLogger(__name__)
 
 
-class InvitationState(IntEnum):
-    UNSENT = 1
-    SENT = 2
-    CONSUMED = 3
-    EXPIRED = 4
+class InvitationState(Enum):
+    UNSENT = "Unsent"
+    SENT = "Sent"
+    CONSUMED = "Consumed"
+    EXPIRED = "Expired"
 
 
 class Invitation(models.Model):
@@ -29,8 +29,10 @@ class Invitation(models.Model):
         null=True,
         blank=True,
     )
-    code = models.CharField(max_length=64, unique=True)
-    state = FSMIntegerField(default=InvitationState.UNSENT.value)
+    code = models.CharField(
+        max_length=64, unique=True, verbose_name=_("Invitation code")
+    )
+    state = FSMField(default=InvitationState.UNSENT.value)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
