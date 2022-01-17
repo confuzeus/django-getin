@@ -4,3 +4,5 @@ wheel
 coverage
 Sphinx
 twine
+pytest
+pytest-django
