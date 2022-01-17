@@ -1,9 +1,14 @@
 import logging
-from enum import IntEnum
+import secrets
+import string
+from enum import Enum
 
 from django.conf import settings
 from django.db import models
-from django_fsm import FSMIntegerField, transition
+from django.utils.translation import gettext_lazy as _
+from django_fsm import FSMField, transition
+
+from getin import settings as app_settings
 
 log = logging.getLogger(__name__)
 
@@ -28,6 +33,21 @@ class Invitation(models.Model):
     state = FSMIntegerField(default=InvitationState.UNSENT.value)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    @staticmethod
+    def generate_code():
+        allowed_chars = string.ascii_uppercase + string.digits
+        return "".join(
+            secrets.choice(allowed_chars) for _ in range(app_settings.CODE_BYTES)
+        )
+
+    @classmethod
+    def create(cls):
+        code = cls.generate_code()
+        invitation = cls(code=code)
+        invitation.full_clean()
+        invitation.save()
+        return invitation
 
     @transition(
         field=state,
