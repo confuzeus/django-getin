@@ -1,0 +1,8 @@
+Hi there,
+
+Here's your invitation{% if site %} for {{ site.name }}{% endif %}:
+
+{{ code }}
+
+Best regards,
+{{ site.name }}
