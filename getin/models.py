@@ -78,8 +78,8 @@ class Invitation(models.Model):
         source=InvitationState.UNSENT.value,
         target=InvitationState.SENT.value,
     )
-    def send_invitation(self, func):
-        func(self.code)
+    def send_invitation(self, func, **kwargs):
+        func(self.code, **kwargs)
 
     def __str__(self):
         return self.code
