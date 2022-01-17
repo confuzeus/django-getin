@@ -78,8 +78,8 @@ class Invitation(models.Model):
         source=InvitationState.UNSENT.value,
         target=InvitationState.SENT.value,
     )
-    def send_invitation(self):
-        raise NotImplemented()
+    def send_invitation(self, func):
+        func(self.code)
 
     def __str__(self):
         return self.code
