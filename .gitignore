@@ -106,3 +106,4 @@ ENV/
 .idea/
 
 django_getin/settings.py
+db.sqlite3
