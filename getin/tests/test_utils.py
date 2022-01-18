@@ -1,6 +1,7 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
+from django.contrib.sites.models import Site
 
 from getin.utils import email_invitation
 
@@ -22,7 +23,8 @@ def test_email_invitation_without_site(invite_code, fake):
     with patch("getin.utils.send_mail") as mock_send_mail:
         with patch("getin.utils.Site") as MockSite:
             mock_objects = MagicMock()
-            mock_objects.get.return_value = None
+            MockSite.DoesNotExist = Exception
+            mock_objects.get.side_effect = MockSite.DoesNotExist()
             MockSite.objects = mock_objects
 
             email_invitation(invite_code, email=fake.ascii_email())
