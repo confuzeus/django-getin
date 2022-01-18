@@ -75,6 +75,18 @@ class Invitation(models.Model):
         log.info(f"Invitation {self.pk} has been forced to expire.")
 
     @transition(
+        field=state,
+        source=InvitationState.SENT.value,
+        target=InvitationState.EXPIRED.value,
+    )
+    def expire(self):
+        """
+        Expire sent invitations that have yet to be consumed.
+        :return: None
+        """
+        log.info(f"Invitation {self.pk} is expired.")
+
+    @transition(
         field="state",
         source=InvitationState.UNSENT.value,
         target=InvitationState.SENT.value,

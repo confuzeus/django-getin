@@ -56,6 +56,17 @@ def test_invitation_force_expire(sent_invitation):
 
 
 @pytest.mark.django_db
+def test_invitation_expire(sent_invitation):
+    sent_invitation.expire()
+
+    assert sent_invitation.state == InvitationState.EXPIRED.value
+
+    # Should not be saved yet
+    sent_invitation.refresh_from_db()
+    assert sent_invitation.state == InvitationState.SENT.value
+
+
+@pytest.mark.django_db
 def test_invitation_str(unsent_invitation):
     assert str(unsent_invitation) == unsent_invitation.code
 
