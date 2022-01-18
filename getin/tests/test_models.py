@@ -1,6 +1,7 @@
 from unittest.mock import MagicMock
 
 import pytest
+from django.core.exceptions import ValidationError
 from django_fsm import TransitionNotAllowed
 
 from getin.models import Invitation, InvitationState
@@ -57,3 +58,17 @@ def test_invitation_force_expire(sent_invitation):
 @pytest.mark.django_db
 def test_invitation_str(unsent_invitation):
     assert str(unsent_invitation) == unsent_invitation.code
+
+
+@pytest.mark.django_db
+def test_invitation_validation_unconsumed_user(unsent_invitation, user):
+    unsent_invitation.user = user
+    with pytest.raises(ValidationError):
+        unsent_invitation.full_clean()
+
+
+@pytest.mark.django_db
+def test_invitation_validation_consumed_no_user(consumed_invitation):
+    consumed_invitation.user = None
+    with pytest.raises(ValidationError):
+        consumed_invitation.full_clean()

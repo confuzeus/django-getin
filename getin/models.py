@@ -4,6 +4,7 @@ import string
 from enum import Enum
 
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django_fsm import FSMField, transition
@@ -80,6 +81,15 @@ class Invitation(models.Model):
     )
     def send_invitation(self, func, **kwargs):
         func(self.code, **kwargs)
+
+    def clean(self):
+
+        if (self.user is not None and self.state != InvitationState.CONSUMED.value) or (
+            self.user is None and self.state == InvitationState.CONSUMED.value
+        ):
+            raise ValidationError(
+                _("Consume invitations must have a user and unconsumed ones must not.")
+            )
 
     def __str__(self):
         return self.code
