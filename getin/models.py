@@ -22,11 +22,10 @@ class InvitationState(Enum):
 
 
 class Invitation(models.Model):
-    USER_RELATED_NAME = "getin_invitation"
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name=USER_RELATED_NAME,
+        related_name="getin_invitation",
         null=True,
         blank=True,
     )
