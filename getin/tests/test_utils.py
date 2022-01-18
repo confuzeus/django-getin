@@ -1,7 +1,6 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from django.contrib.sites.models import Site
 
 from getin.utils import email_invitation
 
