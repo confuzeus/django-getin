@@ -102,6 +102,7 @@ class Invitation(models.Model):
             raise ValidationError(
                 _("Consume invitations must have a user and unconsumed ones must not.")
             )
+        return super(Invitation, self).clean()
 
     def __str__(self):
         return self.code
