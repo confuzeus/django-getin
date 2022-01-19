@@ -99,23 +99,6 @@ class Command(BaseCommand):
             invitation.full_clean()
             invitation.save()
 
-    def _delete_invitations(
-        self, id_: Optional[int] = None, all_: bool = False, state: Optional[str] = None
-    ):
-        if id_:
-            invitation = self._get_invitation(id_)
-            invitation.delete()
-            self.stdout.write(_(f'Invitation with ID "{id_}" has been deleted.'))
-            return
-
-        invitations = None
-        if all_:
-            invitations = Invitation.objects.filter(state=state)
-            invitations.delete()
-
-        if not invitations:
-            self.stdout.write(self.style.WARNING(_("No invitations found.")))
-
     def add_arguments(self, parser):
         action_group = parser.add_mutually_exclusive_group()
         action_group.add_argument(
@@ -135,9 +118,6 @@ class Command(BaseCommand):
             "--force-expire",
             action="store_true",
             help=_("Force invitations to expire."),
-        )
-        action_group.add_argument(
-            "--delete", action="store_true", help=_("Delete invitations.")
         )
 
         amount_group = parser.add_mutually_exclusive_group()
@@ -174,7 +154,6 @@ class Command(BaseCommand):
         expire = options.get("expire")
         force_expire = options.get("force_expire")
         send = options.get("send")
-        delete = options.get("delete")
 
         count = options.get("count")
         id_ = options.get("id")
@@ -196,6 +175,3 @@ class Command(BaseCommand):
             if not email:
                 raise CommandError(_("Please provide an email address."))
             return self._send_invitation(id_, email=email)
-
-        if delete:
-            return self._delete_invitations(id_, all_, state)
