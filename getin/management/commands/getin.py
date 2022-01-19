@@ -76,7 +76,12 @@ class Command(BaseCommand):
             invitations = Invitation.objects.filter(state=state)
 
         elif all_ and not state:
-            invitations = Invitation.objects.all()
+            cont = input(_("This will expire all invitations. Continue? (y/n)"))
+            if cont.strip().lower() == "y":
+                invitations = Invitation.objects.all()
+            else:
+                self.stdout.write("Aborted.")
+                return
 
         if invitations:
             for invitation in invitations:
