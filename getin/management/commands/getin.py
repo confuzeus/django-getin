@@ -96,6 +96,8 @@ class Command(BaseCommand):
         if method == "email":
 
             invitation.send_invitation(email_invitation, **kwargs)
+            invitation.full_clean()
+            invitation.save()
 
     def _delete_invitations(
         self, id_: Optional[int] = None, all_: bool = False, state: Optional[str] = None
