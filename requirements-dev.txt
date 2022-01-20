@@ -10,3 +10,4 @@ pytest-cov
 Faker
 build
 django-extensions
+django-debug-toolbar
