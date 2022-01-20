@@ -1,7 +1,7 @@
 from unittest.mock import patch
 
 import pytest
-from django.core.management import call_command
+from django.core.management import CommandError, call_command
 
 from getin.models import Invitation, InvitationState
 
@@ -42,9 +42,9 @@ def test_expire_invitations():
 
     def _send():
 
-        for invitation in Invitation.objects.all():
-            invitation.send_invitation(send)
-            invitation.save()
+        for unsent_invitation in Invitation.objects.all():
+            unsent_invitation.send_invitation(send)
+            unsent_invitation.save()
 
     _send()
     call_command("getin", "--expire", "--all", state=InvitationState.SENT.value)
@@ -97,3 +97,9 @@ def test_send_invitation(unsent_invitation):
         mock_send_fn.assert_called_with(unsent_invitation.code, email="john@smith.com")
         unsent_invitation.refresh_from_db()
         assert unsent_invitation.state == InvitationState.SENT.value
+
+
+@pytest.mark.django_db
+def test_send_invitation_invalid_pk():
+    with pytest.raises(CommandError):
+        call_command("getin", "--send", "--id", 1000, "--email", "john@smith.com")
