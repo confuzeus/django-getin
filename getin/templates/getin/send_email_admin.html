@@ -1,0 +1,23 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block extrastyle %}{{ block.super }}
+    <link rel="stylesheet" type="text/css" href="{% static "admin/css/forms.css" %}">{% endblock %}
+
+{% block content %}
+    <h3 style="margin: 30px 0;">{% trans "Invitation code: " %}{{ invitation.code }}</h3>
+    <form action="." method="post">
+        {% csrf_token %}
+        <div>
+            <label for="form-email">Email:</label>
+            <input id="form-email" type="email" name="email" required>
+        </div>
+        <div style="margin: 20px 0;">
+            <button style="background-color: var(--default-button-bg); border: none; padding: 10px; display: block; color: white; cursor: pointer;"
+                    type="submit">Send
+            </button>
+        </div>
+
+    </form>
+{% endblock %}

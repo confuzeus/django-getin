@@ -3,11 +3,17 @@ from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 from django.db.models import QuerySet
 from django.http import HttpRequest
+from django.shortcuts import get_object_or_404, redirect
+from django.template.response import TemplateResponse
+from django.urls import path, reverse_lazy
+from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 from django.contrib import messages
 from django_fsm import TransitionNotAllowed
 
+from getin.forms import EmailInvitationForm
 from getin.models import Invitation, InvitationState
+from getin.utils import email_invitation
 
 
 def _transition_queryset(
@@ -56,7 +62,62 @@ def force_expire(
 
 @admin.register(Invitation)
 class InvitationAdmin(admin.ModelAdmin):
-    list_display = ("code", "state", "created_at")
+    list_display = ("code", "state", "created_at", "send_list_btn")
     date_hierarchy = "created_at"
     readonly_fields = ("user", "code", "state", "created_at")
     actions = [expire, force_expire]
+
+    @admin.display(description=_("Send"))
+    def send_list_btn(self, obj):
+        html = ""
+        if obj.state == InvitationState.UNSENT.value:
+            html += f"""<a href="{reverse_lazy("admin:email-invitation", kwargs={'pk': obj.pk})}">Send email</a>"""
+        else:
+            html += "-"
+        return format_html(html)
+
+    def get_urls(self):
+        urls = super(InvitationAdmin, self).get_urls()
+        extra_urls = [
+            path(
+                "send-email/<int:pk>/",
+                self.admin_site.admin_view(self.send_email_view),
+                name="email-invitation",
+            )
+        ]
+        return extra_urls + urls
+
+    def send_email_view(self, request: HttpRequest, pk: int):
+        invitation = get_object_or_404(Invitation, pk=pk)
+        form = None
+
+        if request.method == "POST":
+
+            form = EmailInvitationForm(request.POST)
+
+            if form.is_valid():
+
+                invitation.send_invitation(
+                    email_invitation, email=form.cleaned_data["email"]
+                )
+
+                try:
+                    invitation.full_clean()
+                    invitation.save()
+                    messages.success(request, _("Invitation sent."))
+                    return redirect("admin:getin_invitation_changelist")
+                except ValidationError as e:
+                    messages.error(request, _(f"ValidationError: {e}"))
+                except IntegrityError as e:
+                    messages.error(request, _(f"IntegrityError: {e}"))
+
+        if form is None:
+            form = EmailInvitationForm()
+
+        context = dict(
+            self.admin_site.each_context(request),
+            invitation=invitation,
+            subtitle=_("Send email invitation"),
+            form=form,
+        )
+        return TemplateResponse(request, "getin/send_email_admin.html", context)
