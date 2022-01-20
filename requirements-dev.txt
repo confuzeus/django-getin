@@ -9,3 +9,4 @@ pytest-django
 pytest-cov
 Faker
 build
+django-extensions
