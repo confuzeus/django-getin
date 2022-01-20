@@ -41,14 +41,24 @@ class Command(BaseCommand):
         return invitation
 
     def _state_transition(
-        self, obj: Invitation, target: str, force: Optional[bool] = False
+        self,
+        obj: Invitation,
+        target: InvitationState,
+        force: Optional[bool] = False,
+        **kwargs,
     ):
         try:
-            if target == InvitationState.EXPIRED.value:
+            if target == InvitationState.EXPIRED:
                 if force:
                     obj.force_expire()
                 else:
                     obj.expire()
+            elif target == InvitationState.SENT:
+                func = kwargs.pop("send_func")
+                email = kwargs.pop("email")
+                obj.send_invitation(func, email=email)
+            else:
+                raise CommandError(_(f'"{target}" is an unknown target state'))
             obj.full_clean()
             obj.save()
         except TransitionNotAllowed as e:
@@ -68,7 +78,7 @@ class Command(BaseCommand):
     ):
         if id_:
             invitation = self._get_invitation(id_)
-            self._state_transition(invitation, InvitationState.EXPIRED.value, force)
+            self._state_transition(invitation, InvitationState.EXPIRED, force)
             return
 
         invitations = None
@@ -85,7 +95,7 @@ class Command(BaseCommand):
 
         if invitations:
             for invitation in invitations:
-                self._state_transition(invitation, InvitationState.EXPIRED.value, force)
+                self._state_transition(invitation, InvitationState.EXPIRED, force)
             return
         self.stdout.write(self.style.WARNING(_(f"No invitations found.")))
 
@@ -94,10 +104,16 @@ class Command(BaseCommand):
         invitation = self._get_invitation(id_)
 
         if method == "email":
-
-            invitation.send_invitation(email_invitation, **kwargs)
-            invitation.full_clean()
-            invitation.save()
+            self._state_transition(
+                invitation,
+                InvitationState.SENT,
+                send_func=email_invitation,
+                email=kwargs.pop("email"),
+            )
+        else:
+            raise CommandError(
+                _(f'I don\'t know how to send invitations using "{method}".')
+            )
 
     def add_arguments(self, parser):
         action_group = parser.add_mutually_exclusive_group()
