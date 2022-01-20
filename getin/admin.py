@@ -19,7 +19,7 @@ from getin.utils import email_invitation
 def _transition_queryset(
     modeladmin: admin.ModelAdmin,
     request: HttpRequest,
-    queryset: QuerySet,
+    queryset: QuerySet[Invitation],
     method: InvitationState,
     **kwargs,
 ):
@@ -30,6 +30,12 @@ def _transition_queryset(
                     invitation.force_expire()
                 else:
                     invitation.expire()
+            elif method == InvitationState.SENT:
+
+                def _send_func(code):
+                    pass
+
+                invitation.send_invitation(_send_func)
             invitation.full_clean()
             invitation.save()
         except TransitionNotAllowed as e:
@@ -60,12 +66,21 @@ def force_expire(
     )
 
 
+@admin.action(description=_("Mark selected invitations as sent."))
+def mark_as_sent(
+    modeladmin: admin.ModelAdmin, request: HttpRequest, queryset: QuerySet
+):
+    _transition_queryset(
+        modeladmin, request, queryset, InvitationState.SENT, force=True
+    )
+
+
 @admin.register(Invitation)
 class InvitationAdmin(admin.ModelAdmin):
     list_display = ("code", "state", "created_at", "send_list_btn")
     date_hierarchy = "created_at"
     readonly_fields = ("user", "code", "state", "created_at")
-    actions = [expire, force_expire]
+    actions = [expire, force_expire, mark_as_sent]
 
     @admin.display(description=_("Send"))
     def send_list_btn(self, obj):
