@@ -1,4 +1,4 @@
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 from django.db.models import QuerySet
@@ -8,7 +8,6 @@ from django.template.response import TemplateResponse
 from django.urls import path, reverse_lazy
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
-from django.contrib import messages
 from django_fsm import TransitionNotAllowed
 
 from getin.forms import EmailInvitationForm
@@ -86,7 +85,8 @@ class InvitationAdmin(admin.ModelAdmin):
     def send_list_btn(self, obj):
         html = ""
         if obj.state == InvitationState.UNSENT.value:
-            html += f"""<a href="{reverse_lazy("admin:email-invitation", kwargs={'pk': obj.pk})}">Send email</a>"""
+            invite_url = reverse_lazy("admin:email-invitation", kwargs={"pk": obj.pk})
+            html += f"""<a href="{invite_url}">Send email</a>"""
         else:
             html += "-"
         return format_html(html)
