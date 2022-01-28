@@ -4,6 +4,7 @@ import pytest
 from django.contrib.admin import AdminSite
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
+from django.http import HttpRequest
 from faker import Faker
 
 from getin.admin import InvitationAdmin
@@ -68,3 +69,10 @@ def admin_user(db, fake):
 def invitation_admin(db) -> InvitationAdmin:
     admin_site = AdminSite()
     return InvitationAdmin(model=Invitation, admin_site=admin_site)
+
+
+@pytest.fixture
+def admin_request(admin_user, rf) -> HttpRequest:
+    request = rf.get("/")
+    request.user = admin_user
+    return request
