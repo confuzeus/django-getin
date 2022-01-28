@@ -1,10 +1,12 @@
 from unittest.mock import MagicMock
 
 import pytest
-from faker import Faker
-from django.contrib.sites.models import Site
+from django.contrib.admin import AdminSite
 from django.contrib.auth import get_user_model
+from django.contrib.sites.models import Site
+from faker import Faker
 
+from getin.admin import InvitationAdmin
 from getin.models import Invitation
 
 User = get_user_model()
@@ -53,3 +55,16 @@ def consumed_invitation(db, sent_invitation, user):
 @pytest.fixture
 def user(db, fake):
     return User.objects.create(username=fake.user_name(), email=fake.ascii_email())
+
+
+@pytest.fixture
+def admin_user(db, fake):
+    return User.objects.create(
+        username=fake.user_name(), email=fake.ascii_email(), is_staff=True
+    )
+
+
+@pytest.fixture
+def invitation_admin(db) -> InvitationAdmin:
+    admin_site = AdminSite()
+    return InvitationAdmin(model=Invitation, admin_site=admin_site)
