@@ -8,7 +8,7 @@ from django.template.response import TemplateResponse
 from django.urls import path, reverse_lazy
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
-from django_fsm import TransitionNotAllowed
+from django_fsm import TransitionNotAllowed, can_proceed
 
 from getin.forms import EmailInvitationForm
 from getin.models import Invitation, InvitationState
@@ -103,12 +103,20 @@ class InvitationAdmin(admin.ModelAdmin):
                 "send-email/<int:pk>/",
                 self.admin_site.admin_view(self.send_email_view),
                 name="email-invitation",
-            )
+            ),
         ]
         return extra_urls + urls
 
     def send_email_view(self, request: HttpRequest, pk: int):
         invitation = get_object_or_404(Invitation, pk=pk)
+
+        if not can_proceed(invitation.send_invitation):
+            self.message_user(
+                request,
+                _(f"This invitation can't be sent because it's {invitation.state}."),
+                level=messages.WARNING,
+            )
+            return redirect("admin:getin_invitation_changelist")
         form = None
 
         if request.method == "POST":
@@ -124,12 +132,18 @@ class InvitationAdmin(admin.ModelAdmin):
                 try:
                     invitation.full_clean()
                     invitation.save()
-                    messages.success(request, _("Invitation sent."))
+                    self.message_user(
+                        request, _("Invitation sent."), level=messages.SUCCESS
+                    )
                     return redirect("admin:getin_invitation_changelist")
                 except ValidationError as e:  # pragma: no cover
-                    messages.error(request, _(f"ValidationError: {e}"))
+                    self.message_user(
+                        request, _(f"ValidationError: {e}"), level=messages.ERROR
+                    )
                 except IntegrityError as e:  # pragma: no cover
-                    messages.error(request, _(f"IntegrityError: {e}"))
+                    self.message_user(
+                        request, _(f"IntegrityError: {e}"), level=messages.ERROR
+                    )
 
         if form is None:
             form = EmailInvitationForm()
@@ -141,3 +155,23 @@ class InvitationAdmin(admin.ModelAdmin):
             form=form,
         )
         return TemplateResponse(request, "getin/send_email_admin.html", context)
+
+    def add_view(self, request: HttpRequest, form_url="", extra_context=None):
+
+        if request.method == "POST":
+
+            invitation = Invitation.create()
+
+            self.message_user(
+                request, f"Invitation {invitation.code} has been created."
+            )
+            return redirect(
+                reverse_lazy(
+                    "admin:getin_invitation_change", kwargs={"object_id": invitation.pk}
+                )
+            )
+
+        context = dict(
+            self.admin_site.each_context(request), subtitle=_("Create invitation")
+        )
+        return TemplateResponse(request, "getin/confirm_create.html", context)

@@ -1,0 +1,18 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block content %}
+    <form action="." method="post">
+        {% csrf_token %}
+        <p>{% trans 'Are you sure you want to create an invitation?' %} </p>
+        <div style="display: flex; align-items: center;">
+            <button style="background-color: var(--default-button-bg); border: none; padding: 10px; display: block; color: white; cursor: pointer; margin-right: 20px;"
+                    type="submit">Yes
+            </button>
+            <a style="background-color: var(--delete-button-bg); border: none; padding: 10px; display: block; color: white; cursor: pointer;" href="{% url "admin:getin_invitation_changelist" %}">
+                No
+            </a>
+        </div>
+    </form>
+{% endblock %}
