@@ -32,6 +32,11 @@ def _transition_queryset(
             elif method == InvitationState.SENT:
 
                 def _send_func(code):
+                    """
+                    Pretend like we're sending an invitation.
+                    :param code: Invitation code
+                    :return: None
+                    """
                     pass
 
                 invitation.send_invitation(_send_func)
