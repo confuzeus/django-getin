@@ -126,9 +126,9 @@ class InvitationAdmin(admin.ModelAdmin):
                     invitation.save()
                     messages.success(request, _("Invitation sent."))
                     return redirect("admin:getin_invitation_changelist")
-                except ValidationError as e:
+                except ValidationError as e:  # pragma: no cover
                     messages.error(request, _(f"ValidationError: {e}"))
-                except IntegrityError as e:
+                except IntegrityError as e:  # pragma: no cover
                     messages.error(request, _(f"IntegrityError: {e}"))
 
         if form is None:
