@@ -97,7 +97,7 @@ class Command(BaseCommand):
             for invitation in invitations:
                 self._state_transition(invitation, InvitationState.EXPIRED, force)
             return
-        self.stdout.write(self.style.WARNING(_(f"No invitations found.")))
+        self.stdout.write(self.style.WARNING(_("No invitations found.")))
 
     def _send_invitation(self, id_, method: str = "email", **kwargs):
 
