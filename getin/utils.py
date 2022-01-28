@@ -1,7 +1,9 @@
 import logging
+
+from django.contrib.sites.models import Site
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
-from django.contrib.sites.models import Site
+
 from getin import settings as app_settings
 
 log = logging.getLogger(__name__)
