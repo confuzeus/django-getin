@@ -46,11 +46,11 @@ def _transition_queryset(
             modeladmin.message_user(
                 request, f"TransitionNotAllowed: {e}", level=messages.ERROR
             )
-        except ValidationError as e:
+        except ValidationError as e:  # pragma: no cover
             modeladmin.message_user(
                 request, f"ValidationError: {e}", level=messages.ERROR
             )
-        except IntegrityError as e:
+        except IntegrityError as e:  # pragma: no cover
             modeladmin.message_user(
                 request, f"IntegrityError: {e}", level=messages.ERROR
             )
