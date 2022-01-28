@@ -11,3 +11,5 @@ Faker
 build
 django-extensions
 django-debug-toolbar
+black
+isort
