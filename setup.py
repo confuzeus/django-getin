@@ -10,9 +10,35 @@ with open("README.rst") as readme_file:
 with open("HISTORY.rst") as history_file:
     history = history_file.read()
 
-requirements = ["Django>=3.2", "django-fsm>=2.8.0,<3.0"]
+requirements_test = [
+    "pytest",
+    "pytest-django",
+    "Faker",
+]
+requirements_base = ["Django>=3.2", "django-fsm>=2.8.0,<3.0"]
 
-test_requirements = []
+requirements_dev = [
+    *requirements_test,
+    "pip",
+    "pip",
+    "bump2version",
+    "wheel",
+    "coverage",
+    "Sphinx",
+    "twine",
+    "pytest-cov",
+    "build",
+    "django-extensions",
+    "django-debug-toolbar",
+    "black",
+    "isort",
+    "flake8",
+]
+
+extras_require = {
+    'dev': requirements_dev,
+    'test': requirements_test,
+}
 
 setup(
     author="Josh Michael Karamuth",
@@ -29,7 +55,8 @@ setup(
         "Programming Language :: Python :: 3.8",
     ],
     description="Invite people to login or register.",
-    install_requires=requirements,
+    extras_require=extras_require,
+    install_requires=requirements_base,
     license="MIT",
     long_description=readme + "\n\n" + history,
     include_package_data=True,
@@ -37,7 +64,7 @@ setup(
     name="django-getin",
     packages=find_packages(include=["getin", "getin.*"]),
     test_suite="tests",
-    tests_require=test_requirements,
+    tests_require=requirements_test,
     url="https://github.com/confuzeus/django-getin",
     version="0.1.0",
     zip_safe=False,
