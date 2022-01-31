@@ -2,6 +2,7 @@ from unittest.mock import MagicMock
 
 import pytest
 from django.urls import reverse
+from pytest_django.asserts import assertTemplateUsed
 
 from getin.admin import _transition_queryset, expire, force_expire, mark_as_sent
 from getin.forms import EmailInvitationForm
@@ -138,3 +139,16 @@ def test_admin_send_email_view(
     assert len(response.context["form"].errors) > 0
     invitation.refresh_from_db()
     assert invitation.state == InvitationState.UNSENT.value
+
+
+@pytest.mark.django_db
+def test_add_view(admin_client):
+    add_url = reverse("admin:getin_invitation_add")
+    response = admin_client.get(add_url)
+    assertTemplateUsed(response, "getin/confirm_create.html")
+
+    invitation_count = Invitation.objects.count()
+    assert invitation_count == 0
+    admin_client.post(add_url)
+    invitation_count = Invitation.objects.count()
+    assert invitation_count == 1
