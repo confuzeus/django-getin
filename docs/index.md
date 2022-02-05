@@ -1,17 +1,39 @@
-# Welcome to MkDocs
+# Django Getin Documentation
 
-For full documentation visit [mkdocs.org](https://www.mkdocs.org).
+Easily turn your app into a private area by requiring users to
+have an invitation code before they can register.
 
-## Commands
+Features:
 
-* `mkdocs new [dir-name]` - Create a new project.
-* `mkdocs serve` - Start the live-reloading docs server.
-* `mkdocs build` - Build the documentation site.
-* `mkdocs -h` - Print help message and exit.
+- Easy management from the Django admin.
+- Or from the CLI with the full fledged interface.
+- Integrates with any authentication provider.
 
-## Project layout
+## Installation
 
-    mkdocs.yml    # The configuration file.
-    docs/
-        index.md  # The documentation homepage.
-        ...       # Other markdown pages, images and other files.
+Install using pip, preferably inside your virtualenv:
+
+```shell
+pip install django-getin
+```
+
+Then, add it to your `INSTALLED_APPS`:
+
+```python
+INSTALLED_APPS = [
+    ...,
+    "getin"
+]
+```
+
+We store invitations in the database, so, you need to apply migrations:
+
+```shell
+python manage.py migrate getin
+```
+
+## Next steps
+
+Learn how to manually integrate with your authentication provider:
+
+[Manual integration](manual-integration.md)
