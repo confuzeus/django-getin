@@ -54,6 +54,13 @@ def consumed_invitation(db, sent_invitation, user):
 
 
 @pytest.fixture
+def expired_invitation(db, sent_invitation):
+    sent_invitation.expire()
+    sent_invitation.save()
+    return sent_invitation
+
+
+@pytest.fixture
 def user(db, fake):
     return User.objects.create(username=fake.user_name(), email=fake.ascii_email())
 
