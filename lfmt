@@ -1,0 +1,8 @@
+#!/bin/sh
+
+export VENV_PATH=./venv
+export BIN_PATH=$VENV_PATH/bin
+
+$BIN_PATH/black "$1"
+$BIN_PATH/isort "$1"
+$BIN_PATH/flake8 "$1"
