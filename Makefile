@@ -1,4 +1,4 @@
-.PHONY: clean clean-build clean-pyc clean-test coverage dist docs help install
+.PHONY: clean clean-build clean-pyc clean-test coverage dist docs help install mailhog
 .DEFAULT_GOAL := help
 
 define BROWSER_PYSCRIPT
@@ -76,3 +76,6 @@ dist: clean ## builds source and wheel package
 
 install: clean ## install the package to the active Python's site-packages
 	pip install -e .
+
+mailhog:
+	docker run -p 127.0.0.1:8025:8025 mailhog/mailhog
