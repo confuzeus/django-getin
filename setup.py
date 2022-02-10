@@ -24,7 +24,7 @@ requirements_dev = [
     "bump2version",
     "wheel",
     "coverage",
-    "mkdocs",
+    "Sphinx",
     "twine",
     "pytest-cov",
     "build",
@@ -36,8 +36,8 @@ requirements_dev = [
 ]
 
 extras_require = {
-    'dev': requirements_dev,
-    'test': requirements_test,
+    "dev": requirements_dev,
+    "test": requirements_test,
 }
 
 setup(
