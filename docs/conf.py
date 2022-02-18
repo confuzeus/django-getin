@@ -18,8 +18,8 @@
 # -- Project information -----------------------------------------------------
 
 project = "Django Getin"
-copyright = "2022, Josh Michael Karamuth\\"
-author = "Josh Michael Karamuth\\"
+copyright = "2022, Josh Michael Karamuth"
+author = "Josh Michael Karamuth"
 
 # The full version, including alpha/beta/rc tags
 release = "0.1.0"
