@@ -33,6 +33,7 @@ requirements_dev = [
     "black",
     "isort",
     "flake8",
+    "watchdog",
 ]
 
 extras_require = {
