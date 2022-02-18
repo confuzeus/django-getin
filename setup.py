@@ -34,6 +34,7 @@ requirements_dev = [
     "isort",
     "flake8",
     "watchdog",
+    "PyYaml",
 ]
 
 extras_require = {
